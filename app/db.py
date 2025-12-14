@@ -19,7 +19,7 @@ class Base(DeclarativeBase):
 class Post(Base):
     __tablename__ = "posts"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, defaults=uuid.uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     caption = Column(Text)
     url = Column(String, nullable = False)
     file_type = Column(String, nullable = False)
