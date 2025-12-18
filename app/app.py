@@ -63,7 +63,7 @@ async def upload_file(
 async def get_feed(
     session: AsyncSession = Depends(get_async_session)
 ):
-    result = await session.execute(select(Post).order_by(Post.created_at.desc()))
+    result = await session.execute(select(Post).order_by(Post.create_at.desc()))
     posts = [row[0] for row in result.all()]
 
     posts_data = []
@@ -75,8 +75,27 @@ async def get_feed(
                "url": post.url,
                "file_type": post.file_type,
                "file_name": post.file_name,
-               "created_at": post.created_at.isoformat()
+               "created_at": post.create_at.isoformat()
            }
         )
     
     return {"posts": posts_data}
+
+@app.delete("/posts/{post_id}")
+async def delete_post(post_id: str, session: AsyncSession = Depends(get_async_session)):
+    try:
+        post_uuid =uuid.UUID(post_id)
+
+        result = await session.execute(select(Post).where(post_id == post_uuid))
+        post = result.scalars().first()
+
+        if not post:
+            raise HTTPException(status_code=404, detail="Post not found")
+        
+        await session.delete(post)
+        await session.commit()
+
+        return {"success": True, "message": "Post deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+                            
