@@ -40,12 +40,12 @@ async def upload_file(
         with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as temp_file:
             temp_file_path = temp_file.name
             shutil.copyfileobj(file.file, temp_file)
-
-        upload_result = imagekit.files.upload(
-            file=open(temp_file_path, "rb"),
-            file_name=file.filename,
-            use_unique_file_name=True,
-            tags=["backend-upload"],
+        with open(temp_file_path, "rb") as f:
+            upload_result = imagekit.files.upload(
+                file =f,
+                file_name=file.filename,
+                use_unique_file_name=True,
+                tags=["backend-upload"],
         )
 
         # SDK returns a FileUploadResponse model on success
